@@ -1,0 +1,94 @@
+-- fct
+
+ajouter la fonction resize
+
+
+ajouter foreach pour bptarea ou bpt du style macro comme pour kaneton
+
+--
+
+bien de faire addrcmp, keycmp, valcmp comme ca on peut faire des areas qui
+decremente. quoique ptet mieux:
+
+bptarea_collide
+bptarea_coalesce
+bptarea_cmp
+
+avec ces trois fonctions on peut comparer les areas + load et unload bien
+sur
+
+-- idcmp
+
+rajouter idcmp
+
+-- doc
+
+t_bptarea_imm est compose d'un t_bptarea_addr et d un void*
+
+-- doc
+
+t_bptarea_addr: forcement un nombre representant une adresse
+t_bptarea_key: clef c'est a dire l adresse du debut d une zone. doit
+               forcement etre un nombre
+t_bptarea_size: taille d'une zone, doit forcement etre un nombre
+
+t_blksz: represente la taille d'un bloc sur le device. cette taille
+         sera utiliser pour contenir un noeud de l arbre
+
+--
+
+bptarea: ensemble de segments ayant des proprietes propre mais surtout
+         appartenant a un identifieur
+
+bptarea: l'arbre des areas
+
+bptid: l'arbre des bindings sur identifants de segments
+
+--
+
+. modifier les SIZE et ALLOC car un arbre d'ID supplementaire
+
+. dire dans la doc que les key, value, in ne peuvent etre specifies comme
+  des path car la sturcture interne de l'arbre utilise les noms de ces champs.
+  ca ne suit donc pas le fonctionnement de bpt pour une raison simple: que le
+  fonctionnement soit plus simple, la contrepartie etant les possibilites
+  extremes en moins grand nombre
+
+. dans la doc expliquer que si quelqu un veut faire des areas decrivant
+  des zones non utilisees par exemple, rien de plus simple il suffit d'init,
+  puis de creer une area de la totalite de la memoire representant l'espace
+  pour l'instant inutilise...
+
+. expliquer dans la doc les operations: add et remove controle les areas
+  alors que modify ne fait que modifier les propriete. par exemple on ne
+  peut pas utiliser modify pour etendre une zone. il faut faire un add
+  ayant les meme propriete et la librairie comprendra le fait qu il faut
+  les joindre en une seule
+
+. la fonction coalesce ne doit que checker si les deux areas on les meme
+  proprietes. en effet la fonction ne doit pas se preocupper des champs
+  addr, nblocks car ils seront parfois inexacts.
+
+. dire dans la doc que si coalesce dit que c est bon on suppose que tous les
+  champs des areas sont identiques sauf pour key, value et range. attention
+  donc car par exemple:
+
+    [area1][area2(just added)] si coalesce dit que ca coalesce on va prendre
+                               area1 et l'etendre pour gagner en rapidite.
+                               de ce fait si les deux areas avec des champs
+                               different, les infos de area2 seront perdues.
+    [ area1                  ]
+
+. ce serait pas mal que le mec puisse utiliser bptarea sans connaitre bpt
+
+. dire dans la doc que si l utilisateur ne veut pas utiliser d'id il lui
+  suffit de toujours passer le meme id, zero par exemple.
+
+. dire que si la fonction dit que ca coalesce alors on estime que les
+  areas sont strictement identiques mis a part pour les champs addr et nblocks
+
+. dire dans la doc que pour l'id il vaut mieux tjs donner une valeur fixe
+  , tjs la meme plutot que de donner par exemple l adresse de l area
+  car cette derniere va faire grossir la structure de donnees pour rien.
+
+. dire dans la doc que deux arbres sont crees: aT et iT -> area_##T et id_##T
